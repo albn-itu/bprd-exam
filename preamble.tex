@@ -1,0 +1,64 @@
+% =======================
+% Imports
+% =======================
+\usepackage[a4paper, nomarginpar, textwidth=16cm, headheight=5mm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{titlesec}
+\usepackage{color}
+\usepackage[page,toc,titletoc,title]{appendix}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\usepackage{float}
+\usepackage[utf8]{inputenc}
+\usepackage{listingsutf8}
+\usepackage{xcolor}
+\usepackage[many]{tcolorbox}
+\usepackage{csquotes}   % Provides international handling of quote marks. Especially useful for bibliography management using BibLaTeX
+
+% =======================
+% Bibliography
+% =======================
+\usepackage[
+    autocite=superscript,
+    sortcites   = true,
+    style       = numeric,
+    defernumbers= true
+]{biblatex}
+\addbibresource{ref.bib}
+
+% =======================
+% Formatting
+% =======================
+\setlength{\parindent}{0pt}
+
+\fancypagestyle{plain}{% copies "fancy" over "plain"
+    \fancyhf{}
+    \fancyhead[L]{\today}
+    \fancyhead[C]{Eksamensopgave}
+    \fancyhead[R]{Albert Rise Nielsen (albn@itu.dk)}
+    \fancyfoot[C]{\thepage}
+}
+\pagestyle{plain}
+
+\renewcommand{\figurename}{Figur} %Så captions starter med Figur og ikke Figure
+
+% =======================
+% Title
+% =======================
+\newcommand{\bigguslinus}{\rule{1.25\linewidth}{0.5mm}}
+
+% =======================
+% Utils
+% =======================
+\newcommand{\tmp}[2]{{\color{red}#1}}
+
+
+\input{fsharp-support.tex}
