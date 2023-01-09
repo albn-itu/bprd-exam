@@ -1,0 +1,4 @@
+void main() {
+  dynamic s;
+  pushStack(s,42); // Fails here
+}
