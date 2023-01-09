@@ -201,15 +201,15 @@ int execcode(word p[], word s[], word iargs[], int iargc,
 Se \ref{ass:1-3}
 
 \subsubsection{Forklaring}
-I \li{Machine.fs} defineres instruktionerne med de definerede navne, derefter defineres deres instruktions nummer, det starver 32 og ender ved 35. Til sidst defineres label environment. Her sker der ikke noget specielt da instruktionerne selv ikke tager nogen argumenter, de tages fra stacken.\\[1ex]
+I \li{Machine.fs} defineres instruktionerne med de definerede navne, derefter defineres deres instruktions nummer, det starver 32 og ender ved 35. Til sidst defineres label environment. Her sker der ikke noget specielt da instruktionerne selv ikke tager nogen argumenter, de tages fra stakken.\\[1ex]
 
-\li{listmachine.c} starter også med at definere instruktionerne og deres nummer, samt et tag til stacks. \li{printInstruction} udvides med en streng version af instruktions navnet. Det spændende er \li{execcode}, her defineres håndteringen af instruktionerne. Først defineres \li{CREATESTACK}. Den finder størrelsen $N$ og allokerer hukkomelsen til stacken. Der allokeres som specifikationen siger, 3 ord mere end den adspurgte størrelse. Heri gemmes en header, størrelsen $N$ og hvor mange elementer der er indsat $top$. En pointer til stacken placeres på stacken.\\
+\li{listmachine.c} starter også med at definere instruktionerne og deres nummer, samt et tag til stacks. \li{printInstruction} udvides med en streng version af instruktions navnet. Det spændende er \li{execcode}, her defineres håndteringen af instruktionerne. Først defineres \li{CREATESTACK}. Den finder størrelsen $N$ og allokerer hukkomelsen til stakken. Der allokeres som specifikationen siger, 3 ord mere end den adspurgte størrelse. Heri gemmes en header, størrelsen $N$ og hvor mange elementer der er indsat $top$. En pointer til stakken placeres på stakken.\\
 
-\li{PUSHSTACK} henter stacken fra stacken og henter det element der skal pushes fra stacken. Derefter hentes top, og det nye element indsættes på stacken. Top øges med 1.\\
+\li{PUSHSTACK} henter stakken fra stakken og henter det element der skal pushes fra stakken. Derefter hentes top, og det nye element indsættes på stakken. Top øges med 1.\\
 
-\li{POPSTACK} henter stacken fra stacken og henter top. Derefter hentes det øverste element fra stacken og placeres på stacken. Top nedsættes med 1. En ting der er værd at notere er at elementet hentes ved $top+2$ istedet for $top+3$ som normalt, da top er 1 foran det rent faktiske element.\\
+\li{POPSTACK} henter stakken fra stakken og henter top. Derefter hentes det øverste element fra stakken og placeres på stakken. Top nedsættes med 1. En ting der er værd at notere er at elementet hentes ved $top+2$ istedet for $top+3$ som normalt, da top er 1 foran det rent faktiske element.\\
 
-\li{PRINTSTACK} henter stacken fra stacken og henter størrelsen og top. Derefter printes stacken ved at køre igennem fra $header\_lokation+3$ til $header\_lokation + (top-1)$. $-1$ af samme grund som $+2$ i \li{POPSTACK}.
+\li{PRINTSTACK} henter stakken fra stakken og henter størrelsen og top. Derefter printes stakken ved at køre igennem fra $header\_lokation+3$ til $header\_lokation + (top-1)$. $-1$ af samme grund som $+2$ i \li{POPSTACK}.
 
 
 
@@ -258,7 +258,7 @@ Super simpel ændring. Instruktioner med 1 argument placeres i \li{Prim1} matche
 
 \subsection{Delopgave 4}\label{ass:2-4}
 \subsubsection{Forklaring}
-I forhold til tests så burde der være tests for success og fejl. Her er det altså når \li{createStack} får en negativ $N$ værdi, hvis \li{pushStack} får en 0 værdi som pointer eller hvis der ikke er plads på stacken. Det successfulde testcase er allerede lavet i \li{stack.lc}, så her kommer de fejlene.
+I forhold til tests så burde der være tests for success og fejl. Her er det altså når \li{createStack} får en negativ $N$ værdi, hvis \li{pushStack} får en 0 værdi som pointer eller hvis der ikke er plads på stakken. Det successfulde testcase er allerede lavet i \li{stack.lc}, så her kommer de fejlene.
 
 \subsubsection{Koden}
 \li{test1.lc}:
