@@ -98,16 +98,55 @@ Koden handler bare om at registrere symbolerne $[],@$ og så parse dem som liste
 \subsection{Delopgave }\label{ass:4-2}
 \subsubsection{Koden}
 \begin{lstlisting}[language=fsharp]
+type value = 
+  | Int of int
+  | Closure of string * string * expr * value env       (* (f, x, fBody, fDeclEnv) *)
+  | ListV of value list
 
+let rec eval (e : expr) (env : value env) : value =
+    match e with
+    ...
+    | List l -> ListV (List.map (fun e -> eval e env) l) 
+    | Prim(ope, e1, e2) -> 
+      let v1 = eval e1 env
+      let v2 = eval e2 env
+      match (ope, v1, v2) with
+      ...
+      | ("=", ListV l1, ListV l2) -> Int (if l1 = l2 then 1 else 0)
+      | ("@", ListV l1, ListV l2) -> ListV (l1 @ l2)
+      ...
+    ...
 \end{lstlisting}
 
 \subsubsection{Eksempel}
 Output fra FSI:
 \begin{lstlisting}
+> open ParseAndRunHigher;;
+> open Parse;;
+> run(fromFile "ex01.txt");;
+val it : HigherFun.value = Int 1
+
+> run(fromFile "ex02.txt");;
+System.Exception: parse error in file ex02.txt near line 1, column 10
+...
+
+> run(fromFile "ex03.txt");;
+val it : HigherFun.value = ListV [Int 43; Int 7]
+
+> run(fromFile "ex04.txt");;
+val it : HigherFun.value = Int 0
+
+> run(fromFile "ex05.txt");;
+val it : HigherFun.value =
+  ListV [Closure ("f", "x", Prim ("+", Var "x", CstI 1), [])]
+
+> run(fromFile "ex06.txt");;
+val it : HigherFun.value = ListV [Closure ("id", "x", Var "x", [])]
 
 \end{lstlisting}
 
 \subsubsection{Forklaring}
+Først tilføjes typen til \li{value} som opgaven siger. Derefter tilføjes en constructor i \li{eval}, den mapper over expressions for at evaluere til deres \li{value} form. I \li{Prim} tilføjes et \li{=} case, som bare bruger FSharps indbyggede lighed på lister, som opfylder opgavens specifikation. Til sidst tilføjes en \li{@} operator som også bruger den interne version, da de fungerer på samme måde.
 
 
 \subsection{Delopgave 3}\label{ass:4-3}
