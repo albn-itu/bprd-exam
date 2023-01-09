@@ -70,9 +70,19 @@ let allocate (kind : int -> var) (typ, x) (varEnv : varEnv) : varEnv * instr lis
     match typ with
     | TypA (TypA _, _) -> 
       raise (Failure "allocate: array of arrays not permitted")
+    | TypA (TypT _, _) -> 
+      raise (Failure "allocate: array of tuples not permitted")
     | TypA (t, Some i) ->
       (* i+1 because we need room for the array elements and pointer to first element. *)        
       let newEnv = ((x, (kind (fdepth+i), typ)) :: env, fdepth+i+1)  
+      let code = [INCSP i; GETSP; CSTI (i-1); SUB]
+      (newEnv, code)
+    | TypT (TypT _, _) -> 
+      raise (Failure "allocate: tuple of tuples not permitted")
+    | TypT (TypA _, _) -> 
+      raise (Failure "allocate: tuple of arrays not permitted")
+    | TypT (t, Some i) ->
+      let newEnv = ((x, (kind (fdepth+i), typ)) :: env, fdepth+i)  
       let code = [INCSP i; GETSP; CSTI (i-1); SUB]
       (newEnv, code)
     | _ -> 
@@ -218,6 +228,8 @@ and cAccess access varEnv funEnv : instr list =
       | Locvar addr, _ -> [GETBP; CSTI addr; ADD]
     | AccDeref e -> cExpr e varEnv funEnv
     | AccIndex(acc, idx) -> cAccess acc varEnv funEnv 
+                            @ [LDI] @ cExpr idx varEnv funEnv @ [ADD]
+    | TupIndex(acc, idx) -> cAccess acc varEnv funEnv 
                             @ [LDI] @ cExpr idx varEnv funEnv @ [ADD]
 
 (* Generate code to evaluate a list es of expressions: *)
