@@ -1,1 +1,93 @@
 \section{Opgave 1}
+\subsection{Delopgave 1}\label{ass:1-1}
+\subsubsection{Koden}
+\begin{lstlisting}[language=fsharp]
+let numbers = FromTo(5,12);
+
+let exam1 = Every(Write(numbers));
+\end{lstlisting}
+\subsubsection{Eksempel}
+Output fra FSI:
+\begin{lstlisting}
+> run exam1;;
+5 6 7 8 9 10 11 12 val it : value = Int 0
+\end{lstlisting}
+
+\subsubsection{Forklaring}
+Koden skal læses indefra og ud. Så først laves en liste med 8 tal, da \li{FromTo} er inklusiv. Hvert tal pakkes ind i et \li{Write} så continuationen nu er en sekvens af 8 \li{Write} udtryk med et tal i. Hvis koden kørtes nu ville det kun være 5 der printes. For at eksekvere alle udtrykkene pakkes det ind i et \li{Every} udtryk som eksekverer det hele.
+
+\subsection{Delopgave 2}\label{ass:1-2}
+\subsubsection{Koden}
+\begin{lstlisting}[language=fsharp]
+let numbers = FromTo(5,12);
+
+let exam2 = Every(Write(Prim("<", CstI 10, numbers)));
+\end{lstlisting}
+
+\subsubsection{Eksempel}
+Output fra FSI:
+\begin{lstlisting}
+> run exam2;;
+11 12 val it : value = Int 0
+\end{lstlisting}
+
+\subsubsection{Forklaring}
+Koden minder meget om den fra \ref{ass:1-1}. Den eneste forskel er at \li{numbers} pakkes ind i et \li{Prim} udtryk der sammenligner det med 10 og kun printer tallene hvis de er over 10. Da 10 tallet placeres først i sammenligningen så er det $10<5,10<6,\ldots$  der sammenlignes, hvilket betyder at det kun er tallene højere end 10 der evaluerer sandt.
+
+\subsection{Delopgave 3}\label{ass:1-3}
+\subsubsection{Koden}
+\begin{lstlisting}[language=fsharp]
+let numbers = FromTo(5,12);
+
+let exam3 = Every(Write(Prim("<", numbers, And(Write (CstS "\n"), numbers))));
+\end{lstlisting}
+
+\subsubsection{Eksempel}
+Output fra FSI:
+\begin{lstlisting}
+> run exam3;;
+
+ 6 7 8 9 10 11 12
+ 7 8 9 10 11 12
+ 8 9 10 11 12
+ 9 10 11 12
+ 10 11 12
+ 11 12
+ 12
+ val it : value = Int 0
+\end{lstlisting}
+
+\subsubsection{Forklaring}
+Koden er en kombination af de tidligere opgaver. I det andet argument af \li{Prim} gives nu sekvensen. Mens i det tredje argument gives et \li{And} udtryk som evaluerer begge af sine argumenter men kun returnerer det andet. Så her printer koden først en ny linje med ny linje karakteren \li{\n}, derefter returnerer den \li{numbers} sekvensen som vi kender den. Selve sammenligningen bliver nu til $8\cdot8$ sammenligninger, da vi sammenligner alle elementer i den sidste sekvens med $5$, printer en ny linje, sammenligner med $6$ osv til og med $12$. Dermed får vi en sekvens af tal hvor der fjernes et ved hver iteration. $5$ vises aldrig da $5<5$ ikke er sandt, det sidste $12$ tal er sammenligningen $11<12$, så der er en sidste tom linje der bare ikke vises.
+
+\subsection{Delopgave 4}\label{ass:1-4}
+\subsubsection{Koden}
+\begin{lstlisting}[language=fsharp]
+
+\end{lstlisting}
+
+\subsubsection{Eksempel}
+Output fra FSI:
+\begin{lstlisting}
+
+\end{lstlisting}
+
+\subsubsection{Forklaring}
+
+
+
+\subsection{Delopgave }\label{ass:1-}
+\subsubsection{Koden}
+\begin{lstlisting}[language=fsharp]
+
+\end{lstlisting}
+
+\subsubsection{Eksempel}
+Output fra FSI:
+\begin{lstlisting}
+
+\end{lstlisting}
+
+\subsubsection{Forklaring}
+
+

@@ -102,6 +102,17 @@ let rec eval (e : expr) (cont : cont) (econt : econt) =
 
 let run e = eval e (fun v -> fun _ -> v) (fun () -> (printfn "Failed"; Int 0));
 
+let numbers = FromTo(5,12);
+
+(* Exam examples *)
+let examEx = run numbers;
+
+let exam1 = Every(Write(numbers));
+
+let exam2 = Every(Write(Prim("<", CstI 10, numbers)));
+
+let exam3 = Every(Write(Prim("<", numbers, And(Write (CstS "\n"), numbers))));
+
 
 (* Examples in abstract syntax *)
 
