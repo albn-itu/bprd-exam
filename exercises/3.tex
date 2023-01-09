@@ -26,7 +26,7 @@ val it : access = TupIndex (AccVar "t1", CstI 0)
 \end{lstlisting}
 
 \subsubsection{Forklaring}
-Intet at tilføje.
+De to tilføjelser er lavet efter opgavens meget detaljerede beskrivelse.
 
 \subsection{Delopgave 2}\label{ass:3-2}
 \subsubsection{Koden}
@@ -37,6 +37,9 @@ rule Token = parse
   | "|)"            { RPARBAR }  
   | '('             { LPAR }
 \end{lstlisting}
+
+\subsubsection{Forklaring}
+Tilføjelsen er lavet efter opgavens meget detaljerede beskrivelse.
 
 \subsection{Delopgave 3}\label{ass:3-3}
 \subsubsection{Koden}
@@ -94,11 +97,10 @@ val it : Absyn.program =
         Block
           [Stmt
              (Expr (Prim1 ("printi", Access (TupIndex (AccVar "t1", CstI 0)))))])]
-
 \end{lstlisting}
 
 \subsubsection{Forklaring}
-Fulgte opgave beskrivelsen.
+Parser tilføjelserne er lavet efter opgavens meget detaljerede beskrivelse.
 
 \subsection{Delopgave 4}\label{ass:3-4}
 \subsubsection{Koden}
@@ -109,38 +111,41 @@ let allocate (kind : int -> var) (typ, x) (varEnv : varEnv) : varEnv * instr lis
     ...
     | TypA (TypT _, _) -> 
       raise (Failure "allocate: array of tuples not permitted")
-    | TypA (t, Some i) ->
-      (* i+1 because we need room for the array elements and pointer to first element. *)        
-      let newEnv = ((x, (kind (fdepth+i), typ)) :: env, fdepth+i+1)  
-      let code = [INCSP i; GETSP; CSTI (i-1); SUB]
-      (newEnv, code)
+    ...
     | TypT (TypT _, _) -> 
       raise (Failure "allocate: tuple of tuples not permitted")
     | TypT (TypA _, _) -> 
       raise (Failure "allocate: tuple of arrays not permitted")
     | TypT (t, Some i) ->
-      let newEnv = ((x, (kind (fdepth+i), typ)) :: env, fdepth+i)  
-      let code = [INCSP i; GETSP; CSTI (i-1); SUB]
+      let newEnv = ((x, (kind (fdepth), typ)) :: env, fdepth+i)  
+      let code = [INCSP i;]
       (newEnv, code)
 
 and cAccess access varEnv funEnv : instr list =
     match access with 
     ...
     | TupIndex(acc, idx) -> cAccess acc varEnv funEnv 
-                            @ [LDI] @ cExpr idx varEnv funEnv @ [ADD]
+                            @ cExpr idx varEnv funEnv @ [ADD]
 \end{lstlisting}
 
 \subsubsection{Eksempel}
 \begin{lstlisting}
+# ./compile.sh
+...
+
+> open ParseAndComp;;
+> compile "tuple";;
+> #quit;;
+
 # java Machine tuple.out
-55 56 4 56 Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: -1
-        at Machine.execcode(Machine.java:70)
-        at Machine.execute(Machine.java:52)
-        at Machine.main(Machine.java:24)
+55 56 55 56
+Ran 0.0 seconds
 \end{lstlisting}
 
 \subsubsection{Forklaring}
-Min version er PT ikke fungerende. Den virker indtil $i=0$ overskriver det første element ved et uhel
+Løsningen er, som resten af opgaven, baseret på liste implementationen. Første tilføjelse er at \li{TypA} ikke kan instantieres med \li{TypT} elementer. De næste to tilføjelser er samme ide, \li{TypT} kan ikke instantieres med sin egen type eller \li{TypA}. Det er ikke understøttet da der bruges ret simpel indeksering ind i hukkomelsen som ikke ville kunne håndtere at skulle bruge et offset for hver liste i liste.\\[1ex]
+
+Den sidste tilføjelse er instantiering af \li{TypT} med en konstant størrelse. Den skiller sig ud fra liste implementationen da der ikke er en pointer til det første element. Så variablen der tilføjes til miljøet er lokationen af det første element, i modsætning til en pointer til de første element. Derfor er instantierings instruktionerne også ret simple, da de bare udvider stacken med den størrelsen. Tilføjelsen i \li{cAccess} reflekterer den ændring ved ikke at lave en \li{LDI} efter \li{cAccess} evalueringen. Det er fordi resultatet af \li{cAccess} er lokationen af det første element, så den følgende addition af indekset er direkte derpå.
 
 \subsection{Delopgave 5}\label{ass:3-5}
 \subsubsection{Forklaring}
@@ -148,21 +153,19 @@ Min version er PT ikke fungerende. Den virker indtil $i=0$ overskriver det førs
 
 \subsection{Delopgave 6}\label{ass:3-6}
 \subsubsection{Forklaring}
-Min version er PT ikke fungerende. Den virker indtil $i=0$ overskriver det første element ved et uhel
+Eksemplet fra \ref{ass:3-4} duplikeres her.
 
 \subsubsection{Eksempel}
 \begin{lstlisting}
 # ./compile.sh
 ...
+
 > open ParseAndComp;;
 > compile "tuple";;
-...
 > #quit;;
 
 # java Machine tuple.out
-55 56 4 56 Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: -1
-        at Machine.execcode(Machine.java:70)
-        at Machine.execute(Machine.java:52)
-        at Machine.main(Machine.java:24)
+55 56 55 56
+Ran 0.0 seconds
 \end{lstlisting}
 
