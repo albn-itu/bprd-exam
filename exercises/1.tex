@@ -58,7 +58,7 @@ Output fra FSI:
 \end{lstlisting}
 
 \subsubsection{Forklaring}
-Koden er en kombination af de tidligere opgaver. I det andet argument af \li{Prim} gives nu sekvensen. Mens i det tredje argument gives et \li{And} udtryk som evaluerer begge af sine argumenter men kun returnerer det andet. Så her printer koden først en ny linje med ny linje karakteren \li{\n}, derefter returnerer den \li{numbers} sekvensen som vi kender den. Selve sammenligningen bliver nu til $8\cdot8$ sammenligninger, da vi sammenligner alle elementer i den sidste sekvens med $5$, printer en ny linje, sammenligner med $6$ osv til og med $12$. Dermed får vi en sekvens af tal hvor der fjernes et ved hver iteration. $5$ vises aldrig da $5<5$ ikke er sandt, det sidste $12$ tal er sammenligningen $11<12$, så der er en sidste tom linje der bare ikke vises.
+Koden er en kombination af de tidligere opgaver. I det andet argument af \li{Prim} gives nu sekvensen. Mens i det tredje argument gives et \li{And} udtryk som evaluerer begge af sine argumenter men kun returnerer det andet. Så her printer koden først en ny linje med ny linje karakteren \li{\\n}, derefter returnerer den \li{numbers} sekvensen som vi kender den. Selve sammenligningen bliver nu til $8\cdot8$ sammenligninger, da vi sammenligner alle elementer i den sidste sekvens med $5$, printer en ny linje, sammenligner med $6$ osv til og med $12$. Dermed får vi en sekvens af tal hvor der fjernes et ved hver iteration. $5$ vises aldrig da $5<5$ ikke er sandt, det sidste $12$ tal er sammenligningen $11<12$, så der er en sidste tom linje der bare ikke vises. En dårlig ting ved strategien er den ekstra linje i toppen af outputtet, og at \li{val it : ...} vises på en ny linje. Den første er fordi \li{Write} evalueres før sekvensen, den sidste er fordi er er en tom linje.
 
 \subsection{Delopgave 4}\label{ass:1-4}
 \subsubsection{Koden}
@@ -104,7 +104,7 @@ D E F G H I J K L M N O P Q R S T U V W X Y Z [ \ ] ^ _ ` a b c val it : value =
 \end{lstlisting}
 
 \subsubsection{Forklaring}
-Koden er baseret på \li{FromTo} generatoren, samme løkke mekanik kan bruges da \li{char} typen kan sammenlignes ligesom en \li{int} i FSharp. Dog skal der lidt konvertering til for at gå en op i tegntabellen. Det gøres ved at oversætte \li{char} til \li{int} - \li{c |> int}, der kan adderes 1 til det integer og derefter konverteres tilbage til \li{char} - \li{...+ 1 |> char}. Se eksempel herunder. En del af opgaven var at generatoren laver \li{Str} typen, som tager en \li{string}. Det kan opnås ved at konveretere \li{char} til \li{string} således \li{c |> string}, som så pakkes ind i \li{Str} typen.
+Koden er baseret på \li{FromTo} generatoren, samme løkke mekanik kan bruges da \li{char} typen kan sammenlignes ligesom en \li{int} i FSharp. Dog skal der lidt konvertering til at gå op i tegntabellen. Det gøres ved at oversætte \li{char} til \li{int} - \li{c |> int}, der adderes 1 og derefter konverteres tilbage til \li{char} - \li{...+ 1 |> char}. Se eksempel herunder. En del af opgaven var at generatoren laver \li{Str} typen, som tager en \li{string}. Det kan opnås ved at konveretere \li{char} til \li{string} således \li{c |> string}, som så pakkes ind i \li{Str} typen.
 
 \begin{lstlisting}[language=fsharp]
 > ('D' |> int) + 1 |> char;;

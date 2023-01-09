@@ -71,8 +71,10 @@ Jeg kompilerer med en række scripts som jeg har skrevet. De kan ses herunder.
 \lstinputlisting[language=bash]{../bin/run.sh}
 
 \subsubsection{Eksempel}
-Output fra FSI:
 \begin{lstlisting}
+# ./compile.sh
+...
+
 > open ParseAndComp;;
 > fromString "void main() {int t1(|2|);}";;
 val it : Absyn.program =
@@ -100,7 +102,7 @@ val it : Absyn.program =
 \end{lstlisting}
 
 \subsubsection{Forklaring}
-Parser tilføjelserne er lavet efter opgavens meget detaljerede beskrivelse.
+Parser tilføjelserne er lavet efter opgavens meget detaljerede beskrivelse og er baseret på liste implementationen.
 
 \subsection{Delopgave 4}\label{ass:3-4}
 \subsubsection{Koden}
@@ -135,6 +137,7 @@ and cAccess access varEnv funEnv : instr list =
 
 > open ParseAndComp;;
 > compile "tuple";;
+...
 > #quit;;
 
 # java Machine tuple.out
@@ -145,7 +148,7 @@ Ran 0.0 seconds
 \subsubsection{Forklaring}
 Løsningen er, som resten af opgaven, baseret på liste implementationen. Første tilføjelse er at \li{TypA} ikke kan instantieres med \li{TypT} elementer. De næste to tilføjelser er samme ide, \li{TypT} kan ikke instantieres med sin egen type eller \li{TypA}. Det er ikke understøttet da der bruges ret simpel indeksering ind i hukkomelsen som ikke ville kunne håndtere at skulle bruge et offset for hver liste i liste.\\[1ex]
 
-Den sidste tilføjelse er instantiering af \li{TypT} med en konstant størrelse. Den skiller sig ud fra liste implementationen da der ikke er en pointer til det første element. Så variablen der tilføjes til miljøet er lokationen af det første element, i modsætning til en pointer til de første element. Derfor er instantierings instruktionerne også ret simple, da de bare udvider stacken med den størrelsen. Tilføjelsen i \li{cAccess} reflekterer den ændring ved ikke at lave en \li{LDI} efter \li{cAccess} evalueringen. Det er fordi resultatet af \li{cAccess} er lokationen af det første element, så den følgende addition af indekset er direkte derpå.
+Den sidste tilføjelse er instantiering af \li{TypT} med en konstant størrelse. Den skiller sig ud fra liste implementationen da der ikke er en pointer til det første element. Så variablen der tilføjes til miljøet er lokationen af det første element, i modsætning til en pointer til det første element. Derfor er instantierings instruktionerne også ret simple, da de bare udvider stakken med størrelsen. Tilføjelsen i \li{cAccess} reflekterer den ændring ved ikke at lave en \li{LDI} efter \li{cAccess} evalueringen. Det er fordi resultatet af \li{cAccess} er lokationen af det første element, så den følgende addition af indekset er direkte derpå.
 
 \subsection{Delopgave 5}\label{ass:3-5}
 \subsubsection{Forklaring}
@@ -162,6 +165,7 @@ Eksemplet fra \ref{ass:3-4} duplikeres her.
 
 > open ParseAndComp;;
 > compile "tuple";;
+...
 > #quit;;
 
 # java Machine tuple.out
