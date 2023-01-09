@@ -35,6 +35,7 @@ type expr =
   | Or  of expr * expr
   | Seq of expr * expr
   | Every of expr 
+  | FromToChar of char * char
   | Fail;;
 
 (* Runtime values and runtime continuations *)
@@ -98,11 +99,21 @@ let rec eval (e : expr) (cont : cont) (econt : econt) =
     | Every e -> 
       eval e (fun _ -> fun econt1 -> econt1 ())
              (fun () -> cont (Int 0) econt)
+    | FromToChar(c1, c2) ->
+      let rec loop c =
+        if c <= c2 then
+          cont (Str (c |> string)) (fun () -> loop ((c |> int) + 1 |> char))
+        else
+          econt ()
+
+      loop c1
     | Fail -> econt ()
 
 let run e = eval e (fun v -> fun _ -> v) (fun () -> (printfn "Failed"; Int 0));
 
 let numbers = FromTo(5,12);
+
+let chars = FromToChar('C', 'L');
 
 (* Exam examples *)
 let examEx = run numbers;
@@ -112,6 +123,8 @@ let exam1 = Every(Write(numbers));
 let exam2 = Every(Write(Prim("<", CstI 10, numbers)));
 
 let exam3 = Every(Write(Prim("<", numbers, And(Write (CstS "\n"), numbers))));
+
+let exam4 = Every(Write(chars));
 
 
 (* Examples in abstract syntax *)

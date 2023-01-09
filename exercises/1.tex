@@ -62,18 +62,54 @@ Koden er en kombination af de tidligere opgaver. I det andet argument af \li{Pri
 
 \subsection{Delopgave 4}\label{ass:1-4}
 \subsubsection{Koden}
+Ændringer i \li{Icon.fs}
 \begin{lstlisting}[language=fsharp]
+type expr = 
+  ...
+  | FromToChar of char * char
+  | Fail;;
 
+let rec eval (e : expr) (cont : cont) (econt : econt) = 
+    match e with
+    ...
+    | FromToChar(c1, c2) ->
+      let rec loop c =
+        if c <= c2 then
+          cont (Str (c |> string)) (fun () -> loop ((c |> int) + 1 |> char))
+        else
+          econt ()
+
+      loop c1
+    | Fail -> econt ()
+
+let chars = FromToChar('C', 'L');
+let exam4 = Every(Write(chars));
 \end{lstlisting}
 
 \subsubsection{Eksempel}
 Output fra FSI:
 \begin{lstlisting}
+> run exam4;;
+C D E F G H I J K L val it : value = Int 0
 
+> run chars;;
+val it : value = Str "C"
+
+> run (FromToChar('D', 'A'));;
+Failed
+val it : value = Int 0
+
+> run (Every(Write(FromToChar('D', 'c'))));;
+D E F G H I J K L M N O P Q R S T U V W X Y Z [ \ ] ^ _ ` a b c val it : value = Int 0
 \end{lstlisting}
 
 \subsubsection{Forklaring}
+Koden er baseret på \li{FromTo} generatoren, samme løkke mekanik kan bruges da \li{char} typen kan sammenlignes ligesom en \li{int} i FSharp. Dog skal der lidt konvertering til for at gå en op i tegntabellen. Det gøres ved at oversætte \li{char} til \li{int} - \li{c |> int}, der kan adderes 1 til det integer og derefter konverteres tilbage til \li{char} - \li{...+ 1 |> char}. Se eksempel herunder. En del af opgaven var at generatoren laver \li{Str} typen, som tager en \li{string}. Det kan opnås ved at konveretere \li{char} til \li{string} således \li{c |> string}, som så pakkes ind i \li{Str} typen.
 
+\begin{lstlisting}[language=fsharp]
+> ('D' |> int) + 1 |> char;;
+val it : char = 'E'
+\end{lstlisting}
 
 
 \subsection{Delopgave }\label{ass:1-}
