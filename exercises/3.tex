@@ -2,60 +2,167 @@
 \subsection{Delopgave 1}\label{ass:3-1}
 \subsubsection{Koden}
 \begin{lstlisting}[language=fsharp]
-
+type typ =
+  ...
+  | TypT of typ * int option         (* Tuple type                  *)
+                                                                   
+and access =                                                       
+  ...
+  | TupIndex of access * expr        (* Tuple indexing              *)
 \end{lstlisting}
 
 \subsubsection{Eksempel}
 Output fra FSI:
 \begin{lstlisting}
+> open Absyn;;
+> TypT (TypI, Some 2);;
+val it : typ = TypT (TypI, Some 2)
 
+> TypT (TypI, None);;
+val it : typ = TypT (TypI, None)
+
+> TupIndex (AccVar "t1", CstI 0);;
+val it : access = TupIndex (AccVar "t1", CstI 0)
 \end{lstlisting}
 
 \subsubsection{Forklaring}
-
+Intet at tilføje.
 
 \subsection{Delopgave 2}\label{ass:3-2}
 \subsubsection{Koden}
 \begin{lstlisting}[language=fsharp]
-
+rule Token = parse
+  ...
+  | "(|"            { LPARBAR }  
+  | "|)"            { RPARBAR }  
+  | '('             { LPAR }
 \end{lstlisting}
-
-\subsubsection{Eksempel}
-Output fra FSI:
-\begin{lstlisting}
-
-\end{lstlisting}
-
-\subsubsection{Forklaring}
-
 
 \subsection{Delopgave 3}\label{ass:3-3}
 \subsubsection{Koden}
 \begin{lstlisting}[language=fsharp]
+Vardesc: 
+  ...
+  | Vardesc LPARBAR RPARBAR             { compose1 (fun t -> TypT(t, None)) $1    }
+  | Vardesc LPARBAR CSTINT RPARBAR      { compose1 (fun t -> TypT(t, Some $3)) $1 }
+;
 
+Access:
+  ...
+  | Access LPARBAR Expr RPARBAR         { TupIndex($1, $3)    }   
 \end{lstlisting}
+
+\subsubsection{Kompilering}
+Jeg kompilerer med en række scripts som jeg har skrevet. De kan ses herunder.
+
+\li{compile.sh}
+\lstinputlisting[language=bash]{../exercise-3/compile.sh}
+
+\li{compileLexer.sh}
+\lstinputlisting[language=bash]{../../bin/compileLexer.sh}
+
+\li{compileParser.sh}
+\lstinputlisting[language=bash]{../../bin/compileParser.sh}
+
+\li{run.sh}
+\lstinputlisting[language=bash]{../../bin/run.sh}
 
 \subsubsection{Eksempel}
 Output fra FSI:
 \begin{lstlisting}
+> open ParseAndComp;;
+> fromString "void main() {int t1(|2|);}";;
+val it : Absyn.program =
+  Prog [Fundec (None, "main", [], Block [Dec (TypT (TypI, Some 2), "t1")])]
+
+> fromString "void main() {int t1(||);}";;
+val it : Absyn.program =
+  Prog [Fundec (None, "main", [], Block [Dec (TypT (TypI, None), "t1")])]
+
+> fromString "void main() {t1(|0|) = 55;}";;
+val it : Absyn.program =
+  Prog
+    [Fundec
+       (None, "main", [],
+        Block [Stmt (Expr (Assign (TupIndex (AccVar "t1", CstI 0), CstI 55)))])]
+
+> fromString "void main() {print t1(|0|);}";;
+val it : Absyn.program =
+  Prog
+    [Fundec
+       (None, "main", [],
+        Block
+          [Stmt
+             (Expr (Prim1 ("printi", Access (TupIndex (AccVar "t1", CstI 0)))))])]
 
 \end{lstlisting}
 
 \subsubsection{Forklaring}
-
+Fulgte opgave beskrivelsen.
 
 \subsection{Delopgave 4}\label{ass:3-4}
 \subsubsection{Koden}
 \begin{lstlisting}[language=fsharp]
+let allocate (kind : int -> var) (typ, x) (varEnv : varEnv) : varEnv * instr list =
+    let (env, fdepth) = varEnv 
+    match typ with
+    ...
+    | TypA (TypT _, _) -> 
+      raise (Failure "allocate: array of tuples not permitted")
+    | TypA (t, Some i) ->
+      (* i+1 because we need room for the array elements and pointer to first element. *)        
+      let newEnv = ((x, (kind (fdepth+i), typ)) :: env, fdepth+i+1)  
+      let code = [INCSP i; GETSP; CSTI (i-1); SUB]
+      (newEnv, code)
+    | TypT (TypT _, _) -> 
+      raise (Failure "allocate: tuple of tuples not permitted")
+    | TypT (TypA _, _) -> 
+      raise (Failure "allocate: tuple of arrays not permitted")
+    | TypT (t, Some i) ->
+      let newEnv = ((x, (kind (fdepth+i), typ)) :: env, fdepth+i)  
+      let code = [INCSP i; GETSP; CSTI (i-1); SUB]
+      (newEnv, code)
 
+and cAccess access varEnv funEnv : instr list =
+    match access with 
+    ...
+    | TupIndex(acc, idx) -> cAccess acc varEnv funEnv 
+                            @ [LDI] @ cExpr idx varEnv funEnv @ [ADD]
 \end{lstlisting}
 
 \subsubsection{Eksempel}
-Output fra FSI:
 \begin{lstlisting}
-
+# java Machine tuple.out
+55 56 4 56 Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: -1
+        at Machine.execcode(Machine.java:70)
+        at Machine.execute(Machine.java:52)
+        at Machine.main(Machine.java:24)
 \end{lstlisting}
 
 \subsubsection{Forklaring}
+Min version er PT ikke fungerende. Den virker indtil $i=0$ overskriver det første element ved et uhel
 
+\subsection{Delopgave 5}\label{ass:3-5}
+\subsubsection{Forklaring}
+Ændringerne er forklaret i de opgaver hvor de redigeres i.
+
+\subsection{Delopgave 6}\label{ass:3-6}
+\subsubsection{Forklaring}
+Min version er PT ikke fungerende. Den virker indtil $i=0$ overskriver det første element ved et uhel
+
+\subsubsection{Eksempel}
+\begin{lstlisting}
+# ./compile.sh
+...
+> open ParseAndComp;;
+> compile "tuple";;
+...
+> #quit;;
+
+# java Machine tuple.out
+55 56 4 56 Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: -1
+        at Machine.execcode(Machine.java:70)
+        at Machine.execute(Machine.java:52)
+        at Machine.main(Machine.java:24)
+\end{lstlisting}
 
