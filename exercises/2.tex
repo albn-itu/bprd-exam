@@ -1,5 +1,5 @@
 \section{Opgave 2}
-\subsection{Delopgave 1}\label{ass:1-1}
+\subsection{Delopgave 1}\label{ass:2-1}
 \subsubsection{Koden}
 Kode ændringer givet her i diff format.
 \begin{lstlisting}[language=diff]
@@ -66,34 +66,248 @@ Prog
 \subsubsection{Forklaring}
 Der skal en meget lille ændring til for at parse funktionerne. Først laves de som symboler i lexeren (\li{CLex.fsl}), derefter registreres de i parseren (\li{CPar.fsy}). Også i parser filen defineres deres format og output. Først defineres formatet ved at bruge symbolet, parentes symbolet (\li{LPAR}), udtryk specifikationen (\li{Expr}), og derefter luk parantes (\li{RPAR}). Herefter defineres output, i form af \li{Prim1} som gives en streng der kan matches på senere og det parsede argument. Det gentages for hver funktion, funktioner med 2 argumenter bruger komma symbolet (\li{COMMA}) mellem hvert argument og bruger \li{Prim2} istedet for \li{Prim1}.
 
-\subsection{Delopgave 2}\label{ass:1-2}
+\subsection{Delopgave 2}\label{ass:2-2}
+\subsubsection{Koden}
+Machine.fs:
+\begin{lstlisting}[language=fsharp]
+type instr =
+  ...
+  | CREATESTACK                        (* create stack                    *)
+  | PUSHSTACK                          (* push to top of stack            *)
+  | POPSTACK                           (* pop top of stack                *)
+  | PRINTSTACK                         (* print stack                     *)
+
+...
+let CODESETCDR = 31
+let CODECREATESTACK = 32
+let CODEPUSHSTACK   = 33
+let CODEPOPSTACK    = 34
+let CODEPRINTSTACK  = 35;
+
+
+let makelabenv (addr, labenv) instr = 
+    match instr with
+    ...
+    | CREATESTACK    -> (addr+1, labenv)
+    | PUSHSTACK      -> (addr+1, labenv)
+    | POPSTACK       -> (addr+1, labenv)
+    | PRINTSTACK     -> (addr+1, labenv)
+\end{lstlisting}
+
+listmachine.c:
+\begin{lstlisting}[language=c]
+...
+#define STACKTAG 1
+...
+
+#define CREATESTACK 32
+#define PUSHSTACK 33
+#define POPSTACK 34
+#define PRINTSTACK 35
+
+void printInstruction(word p[], word pc) {
+  switch (p[pc]) {
+  ...
+  case CREATESTACK:
+    printf("CREATESTACK");
+    break;
+  case PUSHSTACK:
+    printf("PUSHSTACK");
+    break;
+  case POPSTACK:
+    printf("POPSTACK");
+    break;
+  case PRINTSTACK:
+    printf("PRINTSTACK");
+    break;
+  ...
+}
+
+int execcode(word p[], word s[], word iargs[], int iargc,
+             int /* boolean */ trace) {
+  ...
+    case CREATESTACK: {
+      word n = Untag(s[sp]);
+
+      if (n < 0) {
+        printf("Cannot create a negative sized stack\n");
+        return -1;
+      }
+
+      word *p = allocate(STACKTAG, n + 3, s, sp);
+      s[sp] = (word)p; // Insert header
+
+      p[1] = Tag(n); // Size
+      p[2] = Tag(0); // Top
+    } break;
+    case PUSHSTACK: {
+      word p = s[sp - 1];
+
+      if (p == 0) {
+        printf("Cannot push to null\n");
+        return -1;
+      }
+
+      word *stack = (word *)p;
+      word size = Untag(stack[1]);
+      word top = Untag(stack[2]);
+
+      if (top >= size) {
+        printf("Cannot push to full stack\n");
+        return -1;
+      }
+
+      word v = s[sp];
+      stack[top + 3] = v;
+      stack[2] = Tag(top + 1);
+      sp--;
+    } break;
+    case POPSTACK: {
+      word p = s[sp];
+
+      if (p == 0) {
+        printf("Cannot push to null\n");
+        return -1;
+      }
+
+      word *stack = (word *)p;
+      word top = Untag(stack[2]);
+
+      if (top == 0) {
+        printf("Cannot pop from empty stack");
+        return -1;
+      }
+
+      s[sp] = stack[top + 2];
+      stack[2] = Tag(top - 1);
+    } break;
+    case PRINTSTACK: {
+      word p = s[sp];
+      word *stack = (word *)p;
+
+      word n = Untag(stack[1]);
+      word top = Untag(stack[2]);
+      printf("STACK(" WORD_FMT ", " WORD_FMT ")=[ ", n, top);
+      for (int i = 0; i < top; i++) {
+        printf(WORD_FMT " ", Untag(stack[i + 3]));
+      }
+      printf("]\n");
+    } break;
+    ...
+}
+\end{lstlisting}
+
+\subsubsection{Eksempel}
+Se \ref{ass:1-3}
+
+\subsubsection{Forklaring}
+I \li{Machine.fs} defineres instruktionerne med de definerede navne, derefter defineres deres instruktions nummer, det starver 32 og ender ved 35. Til sidst defineres label environment. Her sker der ikke noget specielt da instruktionerne selv ikke tager nogen argumenter, de tages fra stacken.\\[1ex]
+
+\li{listmachine.c} starter også med at definere instruktionerne og deres nummer, samt et tag til stacks. \li{printInstruction} udvides med en streng version af instruktions navnet. Det spændende er \li{execcode}, her defineres håndteringen af instruktionerne. Først defineres \li{CREATESTACK}. Den finder størrelsen $N$ og allokerer hukkomelsen til stacken. Der allokeres som specifikationen siger, 3 ord mere end den adspurgte størrelse. Heri gemmes en header, størrelsen $N$ og hvor mange elementer der er indsat $top$. En pointer til stacken placeres på stacken.\\
+
+\li{PUSHSTACK} henter stacken fra stacken og henter det element der skal pushes fra stacken. Derefter hentes top, og det nye element indsættes på stacken. Top øges med 1.\\
+
+\li{POPSTACK} henter stacken fra stacken og henter top. Derefter hentes det øverste element fra stacken og placeres på stacken. Top nedsættes med 1. En ting der er værd at notere er at elementet hentes ved $top+2$ istedet for $top+3$ som normalt, da top er 1 foran det rent faktiske element.\\
+
+\li{PRINTSTACK} henter stacken fra stacken og henter størrelsen og top. Derefter printes stacken ved at køre igennem fra $header\_lokation+3$ til $header\_lokation + (top-1)$. $-1$ af samme grund som $+2$ i \li{POPSTACK}.
+
+
+
+\subsection{Delopgave 3}\label{ass:2-3}
 \subsubsection{Koden}
 \begin{lstlisting}[language=fsharp]
+and cExpr (e : expr) (varEnv : varEnv) (funEnv : funEnv) : instr list = 
+    match e with
+    ...
+    | Prim1(ope, e1) ->
+      cExpr e1 varEnv funEnv
+      @ (match ope with
+         ...
+         | "createStack" -> [CREATESTACK]
+         | "popStack" -> [POPSTACK]
+         | "printStack" -> [PRINTSTACK]
 
+    | Prim2(ope, e1, e2) ->
+      cExpr e1 varEnv funEnv
+      @ cExpr e2 varEnv funEnv
+      @ (match ope with
+         ...
+         | "pushStack" -> [PUSHSTACK]
 \end{lstlisting}
 
 \subsubsection{Eksempel}
 Output fra FSI:
 \begin{lstlisting}
+# mono listcc.exe stack.lc
+List-C compiler v 1.0.0.0 of 2012-02-13
+Compiling stack.lc to stack.out
+Prog
+  [Fundec
+  ...
 
+# ./ListVM/ListVM/listmachine stack.out
+STACK(3, 2)=[ 42 43 ]
+43 42 STACK(3, 0)=[ ]
+
+Used 0 cpu milli-seconds
 \end{lstlisting}
 
 \subsubsection{Forklaring}
+Super simpel ændring. Instruktioner med 1 argument placeres i \li{Prim1} matches og mapper bare til sin egen instruktion. Instruktioner med 2 argumernter placeres ligeså i \li{Prim2}.
 
 
+\subsection{Delopgave 4}\label{ass:2-4}
+\subsubsection{Forklaring}
+I forhold til tests så burde der være tests for success og fejl. Her er det altså når \li{createStack} får en negativ $N$ værdi, hvis \li{pushStack} får en 0 værdi som pointer eller hvis der ikke er plads på stacken. Det successfulde testcase er allerede lavet i \li{stack.lc}, så her kommer de fejlene.
 
-\subsection{Delopgave }\label{ass:1-}
 \subsubsection{Koden}
-\begin{lstlisting}[language=fsharp]
+\li{test1.lc}:
+\begin{lstlisting}[language=c]
+void main() {
+  dynamic s;
+  s = createStack(-1); // Fails here
+}
+\end{lstlisting}
 
+\li{test2.lc}:
+\begin{lstlisting}[language=c]
+void main() {
+  dynamic s;
+  s = createStack(2);
+  pushStack(s,42);
+  pushStack(s,43);
+  pushStack(s,43); // Fails here
+  printStack(s);
+}
+\end{lstlisting}
+
+\li{test3.lc}:
+\begin{lstlisting}[language=c]
+void main() {
+  dynamic s;
+  pushStack(s,42); // Fails here
+}
 \end{lstlisting}
 
 \subsubsection{Eksempel}
-Output fra FSI:
 \begin{lstlisting}
+# mono listcc.exe test1.lc
+# mono listcc.exe test2.lc
+# mono listcc.exe test3.lc
 
+# ./ListVM/ListVM/listmachine test1.out
+Cannot create a negative sized stack
+
+Used 0 cpu milli-seconds
+
+# ./ListVM/ListVM/listmachine test2.out
+Cannot push to full stack
+
+Used 0 cpu milli-seconds
+
+# ./ListVM/ListVM/listmachine test3.out
+Cannot push to null
+
+Used 0 cpu milli-seconds
 \end{lstlisting}
-
-\subsubsection{Forklaring}
-
 
