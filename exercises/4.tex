@@ -150,17 +150,28 @@ Først tilføjes typen til \li{value} som opgaven siger. Derefter tilføjes en c
 
 
 \subsection{Delopgave 3}\label{ass:4-3}
-\subsubsection{Koden}
-\begin{lstlisting}[language=fsharp]
+Se figur \ref{fig:ex03}
 
-\end{lstlisting}
+\begin{sidewaysfigure}
+  \centering
+  \begin{prooftree}
 
-\subsubsection{Eksempel}
-Output fra FSI:
-\begin{lstlisting}
+    \infer0[p1]{\rho\vdash 43 : \sint}
+    \infer1[list]{\rho\vdash [43] : \slist{\sint}}
 
-\end{lstlisting}
+    \hypo{\rho[x\rightarrow \slist{\sint}](x) = \slist{\sint}}
+    \infer1[p3]{\rho[x\rightarrow \slist{\sint}] \vdash x : \slist{\sint}}
+    
+    \infer0[p1]{\rho[x\rightarrow \slist{\sint}] \vdash 3 : \sint}
+    \infer0[p1]{\rho[x\rightarrow \slist{\sint}] \vdash 4 : \sint}
+    \infer2[p4]{\rho[x\rightarrow \slist{\sint}] \vdash 3+4 : \sint}
+    \infer1[list]{\rho[x\rightarrow \slist{\sint}] \vdash [3+4] : \slist{\sint}}
 
-\subsubsection{Forklaring}
+    \infer2[@]{\rho[x\rightarrow \slist{\sint}] \vdash x\ @\ [3+4] : \slist{\sint}}
 
-
+    \infer2[p6]{\rho\vdash\slet x = [43] \sin x\ @\ [3+4] \send : \slist{\sint}}
+  \end{prooftree}
+  \caption{Typetræ for ex03.txt}
+  \label{fig:ex03} 
+\end{sidewaysfigure}
+  

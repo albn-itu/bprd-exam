@@ -22,6 +22,8 @@
 \usepackage{xcolor}
 \usepackage[many]{tcolorbox}
 \usepackage{csquotes}   % Provides international handling of quote marks. Especially useful for bibliography management using BibLaTeX
+\usepackage{ebproof} % Proof trees
+\usepackage{rotating}
 
 % =======================
 % Bibliography
@@ -61,5 +63,18 @@
 \newcommand{\tmp}[2]{{\color{red}#1}}
 \newcommand{\li}[1]{\lstinline{#1}}
 
+% =======================
+% Type trees
+% =======================
+\newcommand{\sint}{\text{int}}
+\newcommand{\sbool}{\text{bool}}
+\renewcommand{\sin}{\text{ in }}
+\newcommand{\slet}{\text{let }}
+\newcommand{\sif}{\text{if }}
+\newcommand{\sthen}{\text{ then }}
+\newcommand{\selse}{\text{ else }}
+\newcommand{\send}{\text{ end}}
+\newcommand{\slist}[1]{#1 \text{ \textbf{list}}}
 
 \input{fsharp-support.tex}
+\input{diff-support.tex}
