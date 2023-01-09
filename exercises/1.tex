@@ -111,19 +111,63 @@ Koden er baseret på \li{FromTo} generatoren, samme løkke mekanik kan bruges da
 val it : char = 'E'
 \end{lstlisting}
 
+En ting der er værd at notere er at store og små bogstaver ikke ligger lige efter hinanden i tegntabellen så man kan ikke generere små til store, kun store til små, og hvis man gør så får man tegnene \li{[ \ ] ^ _ `} imellem tegnene.
 
-\subsection{Delopgave }\label{ass:1-}
+
+\subsection{Delopgave 5}\label{ass:1-5}
 \subsubsection{Koden}
 \begin{lstlisting}[language=fsharp]
+let rec eval (e : expr) (cont : cont) (econt : econt) = 
+    match e with
+    ...
+    | Prim(ope, e1, e2) -> 
+      eval e1 (fun v1 -> fun econt1 ->
+          eval e2 (fun v2 -> fun econt2 -> 
+              match (ope, v1, v2) with
+              ...
+              | ("<", Str s1, Str s2) -> 
+                  if s1<s2 then 
+                      cont (Str s2) econt2
+                  else
+                      econt2 ()
 
+              | _ -> Str "unknown prim2")
+              econt1)
+          econt
+    ...
+
+let exam5_1 = Prim("<", CstS "A", CstS "B");
+let exam5_2 = Prim("<", CstS "B", CstS "A");
 \end{lstlisting}
 
 \subsubsection{Eksempel}
 Output fra FSI:
 \begin{lstlisting}
+> run exam5_1;;
+val it : value = Str "B"
 
+> run exam5_2;;
+Failed
+val it : value = Int 0
 \end{lstlisting}
 
 \subsubsection{Forklaring}
+Løsningen er ret simpel, det er en kopi af sammenligningen af \li{Int} ændret til at tage \li{Str} i stedet. I FSharp er strenge sammenlignlige ligesom integers så der skal ikke ændres meget.
 
+\subsection{Delopgave 6}\label{ass:1-6}
+\subsubsection{Koden}
+\begin{lstlisting}[language=fsharp]
+let chars = FromToChar('C', 'L');
 
+let exam6 = Every(Write(Prim("<", CstS "G", chars)));
+\end{lstlisting}
+
+\subsubsection{Eksempel}
+Output fra FSI:
+\begin{lstlisting}
+> run exam6;;
+H I J K L val it : value = Int 0
+\end{lstlisting}
+
+\subsubsection{Forklaring}
+Løsningen er en simpel afart af \ref{ass:1-2}. Istedet for integers anvendes den nye sammenligning der understøtter strenge og så skal vi bare have alle tegn over \li{'G'}.

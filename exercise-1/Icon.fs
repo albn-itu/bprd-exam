@@ -86,6 +86,11 @@ let rec eval (e : expr) (cont : cont) (econt : econt) =
                       cont (Int i2) econt2
                   else
                       econt2 ()
+              | ("<", Str s1, Str s2) -> 
+                  if s1<s2 then 
+                      cont (Str s2) econt2
+                  else
+                      econt2 ()
               | _ -> Str "unknown prim2")
               econt1)
           econt
@@ -126,6 +131,10 @@ let exam3 = Every(Write(Prim("<", numbers, And(Write (CstS "\n"), numbers))));
 
 let exam4 = Every(Write(chars));
 
+let exam5_1 = Prim("<", CstS "A", CstS "B");
+let exam5_2 = Prim("<", CstS "B", CstS "A");
+
+let exam6 = Every(Write(Prim("<", CstS "G", chars)));
 
 (* Examples in abstract syntax *)
 
