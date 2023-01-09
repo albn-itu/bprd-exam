@@ -1,5 +1,116 @@
 \section{Opgave 4}
-\subsection{Delopgave }\label{ass:1-}
+\subsection{Delopgave }\label{ass:4-1}
+\subsubsection{Koden}
+\li{FunLex.fsl}
+\begin{lstlisting}[language=fsharp]
+rule Token = parse
+  ...
+  | '['             { LBRACK }
+  | ']'             { RBRACK }
+  | ','             { COMMA }
+  | '@'             { AT }
+\end{lstlisting}
+
+\li{FunPar.fsy}
+\begin{lstlisting}[language=fsharp]
+...
+\%token PLUS MINUS TIMES DIV MOD AT
+\%token LPAR RPAR LBRACK RBRACK
+\%token COMMA
+...
+
+\%left ELSE              /* lowest precedence  */
+\%left EQ NE 
+\%left GT LT GE LE
+\%left PLUS MINUS AT
+\%left TIMES DIV MOD 
+\%nonassoc NOT           /* highest precedence  */
+
+Expr:
+  ...
+  | Expr PLUS  Expr                     { Prim("+",  $1, $3)     }
+  | Expr AT    Expr                     { Prim("@",  $1, $3)     }
+  ...
+;
+
+AtExpr:
+  ...
+  | LBRACK List RBRACK                  { List($2)               }
+;
+
+
+List:
+  Expr                                 { [$1]                   }
+  | Expr COMMA List                    { $1 :: $3               }
+;
+\end{lstlisting}
+
+\li{Absyn.fs}
+\begin{lstlisting}[language=fsharp]
+type expr = 
+  ...
+  | List of expr list
+\end{lstlisting}
+
+\subsubsection{Eksempel}
+Output fra FSI:
+\begin{lstlisting}
+> open Parse;;
+> fromFile "ex01.txt";;
+val it : Absyn.expr =
+  Let
+    ("l1", List [CstI 2; CstI 3],
+     Let
+       ("l2", List [CstI 1; CstI 4],
+        Prim
+          ("=", Prim ("@", Var "l1", Var "l2"),
+           List [CstI 2; CstI 3; CstI 1; CstI 4])))
+
+> fromFile "ex02.txt";;
+System.Exception: parse error in file ex02.txt near line 1, column 10
+...
+
+> fromFile "ex03.txt";;
+val it : Absyn.expr =
+  Let
+    ("l", List [CstI 43],
+     Prim ("@", Var "l", List [Prim ("+", CstI 3, CstI 4)]))
+
+> fromFile "ex04.txt";;
+val it : Absyn.expr =
+  Let
+    ("l", List [CstI 3],
+     Prim
+       ("=", Prim ("@", Var "l", List [CstI 3]),
+        List [Prim ("+", CstI 3, CstI 4)]))
+
+> fromFile "ex05.txt";;
+val it : Absyn.expr =
+  Letfun ("f", "x", Prim ("+", Var "x", CstI 1), List [Var "f"])
+
+> fromFile "ex06.txt";;
+val it : Absyn.expr = Letfun ("id", "x", Var "x", List [Var "id"])
+\end{lstlisting}
+
+\subsubsection{Forklaring}
+Koden handler bare om at registrere symbolerne $[],@$ og så parse dem som lister, intent nyt her. ex02 fejler fordi opgaven specifikt siger "En ikke tom liste", så den kan ikke parse den tomme liste.
+
+\subsection{Delopgave }\label{ass:4-2}
+\subsubsection{Koden}
+\begin{lstlisting}[language=fsharp]
+
+\end{lstlisting}
+
+\subsubsection{Eksempel}
+Output fra FSI:
+\begin{lstlisting}
+
+\end{lstlisting}
+
+\subsubsection{Forklaring}
+
+
+\subsection{Delopgave 3}\label{ass:4-3}
 \subsubsection{Koden}
 \begin{lstlisting}[language=fsharp]
 

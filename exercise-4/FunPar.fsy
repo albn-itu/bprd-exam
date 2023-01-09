@@ -12,15 +12,16 @@
 %token <bool> CSTBOOL
 
 %token ELSE END FALSE IF IN LET NOT THEN TRUE
-%token PLUS MINUS TIMES DIV MOD
+%token PLUS MINUS TIMES DIV MOD AT
 %token EQ NE GT LT GE LE
-%token LPAR RPAR 
+%token LPAR RPAR LBRACK RBRACK
+%token COMMA
 %token EOF
 
 %left ELSE              /* lowest precedence  */
 %left EQ NE 
 %left GT LT GE LE
-%left PLUS MINUS
+%left PLUS MINUS AT
 %left TIMES DIV MOD 
 %nonassoc NOT           /* highest precedence  */
 
@@ -40,6 +41,7 @@ Expr:
   | IF Expr THEN Expr ELSE Expr         { If($2, $4, $6)         }
   | MINUS Expr                          { Prim("-", CstI 0, $2)  }
   | Expr PLUS  Expr                     { Prim("+",  $1, $3)     }
+  | Expr AT    Expr                     { Prim("@",  $1, $3)     }
   | Expr MINUS Expr                     { Prim("-",  $1, $3)     }
   | Expr TIMES Expr                     { Prim("*",  $1, $3)     }
   | Expr DIV   Expr                     { Prim("/",  $1, $3)     } 
@@ -58,6 +60,7 @@ AtExpr:
   | LET NAME EQ Expr IN Expr END        { Let($2, $4, $6)        }
   | LET NAME NAME EQ Expr IN Expr END   { Letfun($2, $3, $5, $7) }
   | LPAR Expr RPAR                      { $2                     }
+  | LBRACK List RBRACK                  { List($2)               }
 ;
 
 AppExpr:
@@ -68,4 +71,9 @@ AppExpr:
 Const:
     CSTINT                              { CstI($1)               }
   | CSTBOOL                             { CstB($1)               }
+;
+
+List:
+  Expr                                 { [$1]                   }
+  | Expr COMMA List                    { $1 :: $3               }
 ;
