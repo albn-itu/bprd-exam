@@ -1,4 +1,87 @@
 \section{Opgave 2}
+\subsection{Delopgave 1}\label{ass:1-1}
+\subsubsection{Koden}
+Kode ændringer givet her i diff format.
+\begin{lstlisting}[language=diff]
+diff --git a/exercise-2/CLex.fsl b/exercise-2/CLex.fsl
+index 52e30e0..dc15b8b 100644
+--- a/exercise-2/CLex.fsl
++++ b/exercise-2/CLex.fsl
+@@ -35,6 +35,10 @@ let keyword s =
+     | "true"    -> CSTBOOL 1
+     | "void"    -> VOID 
+     | "while"   -> WHILE         
++    | "createStack" -> CREATESTACK
++    | "pushStack" -> PUSHSTACK
++    | "popStack" -> POPSTACK
++    | "printStack" -> PRINTSTACK
+     | _         -> NAME s
+  
+ let cEscape s = 
+diff --git a/exercise-2/CPar.fsy b/exercise-2/CPar.fsy
+index ed3a85f..3d6d73d 100644
+--- a/exercise-2/CPar.fsy
++++ b/exercise-2/CPar.fsy
+@@ -14,7 +14,7 @@ let nl = CstI 10
+ %token <int> CSTINT CSTBOOL
+ %token <string> CSTSTRING NAME
+ 
+-%token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE
++%token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE CREATESTACK PUSHSTACK POPSTACK PRINTSTACK
+ %token NIL CONS CAR CDR DYNAMIC SETCAR SETCDR
+ %token PLUS MINUS TIMES DIV MOD
+ %token EQ NE GT LT GE LE
+@@ -134,6 +134,10 @@ ExprNotAccess:
+   | Expr LE    Expr                     { Prim2("<=", $1, $3)   }
+   | Expr SEQAND Expr                    { Andalso($1, $3)       }
+   | Expr SEQOR  Expr                    { Orelse($1, $3)        }
++  | CREATESTACK LPAR Expr RPAR          { Prim1("createStack", $3) }
++  | PUSHSTACK LPAR Expr COMMA Expr RPAR { Prim2("pushStack", $3, $5) }
++  | POPSTACK LPAR Expr RPAR             { Prim1("popStack", $3) }
++  | PRINTSTACK LPAR Expr RPAR           { Prim1("printStack", $3) }
+ ;
+ 
+ AtExprNotAccess:
+\end{lstlisting}
+
+\subsubsection{Eksempel}
+\begin{lstlisting}
+# mono listcc.exe stack.lc
+List-C compiler v 1.0.0.0 of 2012-02-13
+Compiling stack.lc to stack.out
+Prog
+  [Fundec
+     (None, "main", [],
+      Block
+        [Dec (TypD, "s");
+         Stmt (Expr (Assign (AccVar "s", Prim1 ("createStack", CstI 3))));
+         Stmt (Expr (Prim2 ("pushStack", Access (AccVar "s"), CstI 42)));
+         Stmt (Expr (Prim2 ("pushStack", Access (AccVar "s"), CstI 43)));
+         Stmt (Expr (Prim1 ("printStack", Access (AccVar "s"))));
+         Stmt (Expr (Prim1 ("printi", Prim1 ("popStack", Access (AccVar "s")))));
+         Stmt (Expr (Prim1 ("printi", Prim1 ("popStack", Access (AccVar "s")))));
+         Stmt (Expr (Prim1 ("printStack", Access (AccVar "s"))))])]
+\end{lstlisting}
+
+\subsubsection{Forklaring}
+Der skal en meget lille ændring til for at parse funktionerne. Først laves de som symboler i lexeren (\li{CLex.fsl}), derefter registreres de i parseren (\li{CPar.fsy}). Også i parser filen defineres deres format og output. Først defineres formatet ved at bruge symbolet, parentes symbolet (\li{LPAR}), udtryk specifikationen (\li{Expr}), og derefter luk parantes (\li{RPAR}). Herefter defineres output, i form af \li{Prim1} som gives en streng der kan matches på senere og det parsede argument. Det gentages for hver funktion, funktioner med 2 argumenter bruger komma symbolet (\li{COMMA}) mellem hvert argument og bruger \li{Prim2} istedet for \li{Prim1}.
+
+\subsection{Delopgave 2}\label{ass:1-2}
+\subsubsection{Koden}
+\begin{lstlisting}[language=fsharp]
+
+\end{lstlisting}
+
+\subsubsection{Eksempel}
+Output fra FSI:
+\begin{lstlisting}
+
+\end{lstlisting}
+
+\subsubsection{Forklaring}
+
+
+
 \subsection{Delopgave }\label{ass:1-}
 \subsubsection{Koden}
 \begin{lstlisting}[language=fsharp]

@@ -22,10 +22,12 @@ let fromString (str : string) : program =
 (* Parsing from a file *)
 
 let fromFile (filename : string) =
-    use reader = new StreamReader(filename)
+    let reader = new StreamReader(filename)
     let lexbuf = (*Lexing.*)LexBuffer<char>.FromTextReader reader
     try 
-      CPar.Main CLex.Token lexbuf
+      let tree = CPar.Main CLex.Token lexbuf
+      printfn "%A" tree
+      tree
     with 
       | exn -> let pos = lexbuf.EndPos 
                failwithf "%s in file %s near line %d, column %d\n" 
